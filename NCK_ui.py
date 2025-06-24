@@ -107,7 +107,7 @@ class NCKUI:
 # ============================== Main Script ================================ #
 if __name__ == "__main__":
     root = tb.Window(themename="darkly")
-    app = BadassUI(root)
+    app = NCKUI(root)
     root.mainloop()
 
 
