@@ -1,5 +1,5 @@
 """
-===============================================================================
+=======================================================================================================================
  Script Title   : nck_ui.py
  Description    : Professional GUI for NCK Inc. to automate ETABS/SAP2000 workflows,
                   interact with Excel spreadsheets, and run analysis scripts.
@@ -7,17 +7,29 @@
  Date Created   : 2025-06-23
  Version        : 1.0.0
  Python Version : 3.10+
- Dependencies   : customtkinter, openpyxl, Pillow (for image support)
-===============================================================================
+ Dependencies   : customtkinter, openpyxl, Pillow, tkinter
+ Environment    : GITHUB_OWNER, GITHUB_REPO, GITHUB_TOKEN (Personal Access Token)
+                  - Set these environment variables to enable GitHub issue creation.
+                  - The PAT should have 'repo' scope for private repos or 'public_repo' for public ones.
+=======================================================================================================================
 """
 
-import customtkinter as ctk
-import tkinter.filedialog as fd
-import tkinter as tk
-from PIL import Image, ImageTk
+from __future__ import annotations
+
 import os
-import requests
 import webbrowser
+
+# Backend configuration (optional)
+# If set, the app will send issues to this backend (which posts to GitHub with your secret PAT)
+# Example: https://your-app.vercel.app/api/create-issue
+BACKEND_URL = os.getenv("GITHUB_BACKEND_URL")
+APP_KEY = os.getenv("APP_KEY")  # optional shared secret header
+import tkinter as tk
+import tkinter.filedialog as fd
+
+import customtkinter as ctk
+import requests
+from PIL import Image
 
 # Color palette extracted from NCK logo
 PRIMARY_COLOR = "#00A3E0"   # Cyan blue from NCK logo
@@ -31,9 +43,18 @@ ctk.set_default_color_theme("blue")
 
 
 class NCKApp(ctk.CTk):
+    
     def __init__(self) -> None:
         super().__init__()
 
+        self._setup_window()
+        self._setup_sidebar()
+        self._setup_main_content_and_tabs()
+
+        # Track last opened Excel file path (optional)
+        self.last_excel_path: str | None = None
+
+    def _setup_window(self) -> None:
         # === Window Configuration ===
         self.title("NCK FEM Tool - Interface")
         self.geometry("1000x650")
@@ -41,6 +62,7 @@ class NCKApp(ctk.CTk):
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
+    def _setup_sidebar(self) -> None:
         # === Sidebar (left) ===
         self.sidebar = ctk.CTkFrame(self, width=220, fg_color=DARK_GRAY)
         self.sidebar.grid(row=0, column=0, sticky="nswe")
@@ -91,6 +113,7 @@ class NCKApp(ctk.CTk):
             text_color=SECONDARY_COLOR,
         ).grid(row=8, column=0, padx=20, pady=(4, 16))
 
+    def _setup_main_content_and_tabs(self) -> None:
         # === Main Content (right) ===
         self.main = ctk.CTkFrame(self, corner_radius=10, fg_color=DARK_COLOR)
         self.main.grid(row=0, column=1, padx=20, pady=20, sticky="nsew")
@@ -109,9 +132,6 @@ class NCKApp(ctk.CTk):
         self._build_home_tab()
         self._build_support_tab()
         self._build_logs_tab()
-
-        # Track last opened Excel file path (optional)
-        self.last_excel_path: str | None = None
 
     # ---------------------------------------------------------------------
     #  Tabs Builders
@@ -190,7 +210,7 @@ class NCKApp(ctk.CTk):
         self.issue_labels_entry.grid(row=2, column=0, sticky="ew", padx=20, pady=6)
 
         # Description label + body
-        ctk.CTkLabel(self.tab_support, text="Description", text_color=LIGHT_COLOR).grid(row=3, column=0, sticky="w", padx=20, pady=(10, 0))
+        ctk.CTkLabel(self.tab_support, text="Description", text_color=LIGHT_COLOR).grid(row=4, column=0, sticky="w", padx=20, pady=(10, 0))
 
         self.issue_body_text = ctk.CTkTextbox(self.tab_support, height=260)
         self.issue_body_text.insert(
@@ -234,6 +254,11 @@ class NCKApp(ctk.CTk):
     #  Navigation helpers
     # ---------------------------------------------------------------------
     def show_home(self) -> None:
+        """
+        Switches the current tab view to the 'Home' tab.
+
+        This method sets the active tab in the tab view to 'Home', updating the user interface accordingly.
+        """
         self.tabview.set("Home")
 
     def show_support(self) -> None:
