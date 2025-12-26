@@ -176,7 +176,7 @@ class NCKApp(ctk.CTk):
 
     def _build_support_tab(self) -> None:
         # Grid config
-        for r in range(8):
+        for r in range(9):
             self.tab_support.grid_rowconfigure(r, weight=0)
         self.tab_support.grid_rowconfigure(6, weight=1)  # body text expands
         self.tab_support.grid_columnconfigure(0, weight=1)
@@ -205,19 +205,20 @@ class NCKApp(ctk.CTk):
         self.issue_title_entry = ctk.CTkEntry(self.tab_support, placeholder_text="Titre (ex: ETABS API - crash à l'ouverture)")
         self.issue_title_entry.grid(row=3, column=0, sticky="ew", padx=20, pady=6)
 
-        # Labels entry
+        # Labels entry 
         self.issue_labels_entry = ctk.CTkEntry(self.tab_support, placeholder_text="Labels (ex: bug, etabs, urgent)")
-        self.issue_labels_entry.grid(row=2, column=0, sticky="ew", padx=20, pady=6)
+        self.issue_labels_entry.grid(row=4, column=0, sticky="ew", padx=20, pady=6)
 
         # Description label + body
-        ctk.CTkLabel(self.tab_support, text="Description", text_color=LIGHT_COLOR).grid(row=4, column=0, sticky="w", padx=20, pady=(10, 0))
+        ctk.CTkLabel(self.tab_support, text="Description", text_color=LIGHT_COLOR).grid(
+        row=5, column=0, sticky="w", padx=20, pady=(10, 0))
 
         self.issue_body_text = ctk.CTkTextbox(self.tab_support, height=260)
         self.issue_body_text.insert(
             "end",
             "Étapes pour reproduire :\n1. ...\n2. ...\n\nRésultat observé :\n\nRésultat attendu :\n\nContexte : (version ETABS/SAP2000, OS, version script, etc.)\n",
         )
-        self.issue_body_text.grid(row=4, column=0, sticky="nsew", padx=20, pady=6)
+        self.issue_body_text.grid(row=6, column=0, sticky="nsew", padx=20, pady=6)
 
         # Include log checkbox
         self.include_log_var = tk.BooleanVar(value=True)
@@ -225,11 +226,11 @@ class NCKApp(ctk.CTk):
             self.tab_support,
             text="Inclure le log (console) si disponible",
             variable=self.include_log_var,
-        ).grid(row=5, column=0, sticky="w", padx=20, pady=6)
+        ).grid(row=7, column=0, sticky="w", padx=20, pady=6)
 
         # Buttons frame
         btn_frame = ctk.CTkFrame(self.tab_support, fg_color="transparent")
-        btn_frame.grid(row=7, column=0, sticky="e", padx=20, pady=(8, 14))
+        btn_frame.grid(row=8, column=0, sticky="e", padx=20, pady=(8, 14))
 
         ctk.CTkButton(btn_frame, text="Créer le ticket", command=self.submit_support, fg_color=PRIMARY_COLOR).grid(row=0, column=0, padx=(0, 10))
         ctk.CTkButton(btn_frame, text="Réinitialiser", command=self._reset_support_form, fg_color=SECONDARY_COLOR, text_color=DARK_COLOR).grid(row=0, column=1, padx=(0,10))
@@ -367,7 +368,7 @@ class NCKApp(ctk.CTk):
         self.issue_body_text.delete("1.0", "end")
         self.issue_body_text.insert(
             "end",
-            "Étapes pour reproduire :\n1. ...\n2. ...\n\nRésultat observé :\n\nRésultat attendu :\n\nContexte : (version ETABS/SAP2000, OS, version script, etc.)\n",
+            "Contexte : (version ETABS/SAP2000, OS, version script, etc.)\n\nÉtapes faites :\n1. ...\n2. ...\n\nRésultat observé :\n\nRésultat attendu :\n\n",
         )
         self.include_log_var.set(True)
 
